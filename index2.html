@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <link rel="icon" type="image/png" href="image/logo.png">
+    <title>إلين - لملابس النساء</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Open+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Leaflet CSS for maps -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <style>
+      :root {
+        --primary-color: #b91c1c; /* Deep Red */
+        --primary-light: #fef2f2;
+        --accent-pink: #db2777; /* Pink-600 */
+        --secondary-color: #f8fafc;
+        --text-dark: #0f172a;
+        --text-light: #64748b;
+        --glass: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.3);
+      }
+
+h1, h2, h3, .headline.ar {
+  font-family: "Amiri", serif;
+}
+h1, h2, h3, .headline.en {
+  font-family: "Didot", serif;
+}
+body, p, .ar {
+  font-family: "Cairo", sans-serif;
+}
+body, p, .en {
+  font-family: "Open Sans", sans-serif;
+}
+
+
+
+      body {
+        overflow-x: hidden;
+        color: var(--text-dark);
+        background-color: var(--secondary-color);
+      }
+
+      /* Padding for fixed header */
+      main {
+        padding-top: 5px;
+      }
+
+      @media (max-width: 768px) {
+        main {
+          padding-top: 5px;
+        }
+      }
+
+      .hero-gradient {
+        background: radial-gradient(
+          circle at top right,
+          #fff1f2 0%,
+          #ffffff 100%
+        );
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--accent-pink);
+        border-radius: 4px;
+      }
+
+      /* Language toggle button */
+      .lang-toggle {
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        z-index: 1000;
+        background-color: var(--accent-pink);
+        color: white;
+        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.4);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-weight: bold;
+      }
+
+      .lang-toggle:hover {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 15px 30px -5px rgba(219, 39, 119, 0.5);
+      }
+
+      /* Sticky header */
+      .sticky-header {
+        transition: all 0.4s ease;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 50;
+        background: white;
+      }
+
+      .sticky-header.sticky {
+        padding-block: 0.75rem;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+      }
+
+      .map-container {
+        height: 100%;
+        width: 100%;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+      }
+
+      .float-animation {
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      /* Branch tab*/
+      .city-tab {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .city-tab.active {
+        background-color: #db2777;
+        color: white;
+        box-shadow: 0 4px 12px rgba(219, 39, 119, 0.3);
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+      }
+
+      .branch-card {
+        border-inline-start: 4px solid transparent;
+        transition: all 0.2s ease;
+      }
+      .branch-card:hover {
+        border-inline-start: 4px solid #db2777;
+        transform: scale(1.01);
+      }
+
+      #map {
+        height: 500px;
+        z-index: 1;
+        border-radius: 1rem;
+      }
+      /* Category cards */
+      .category-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        height: 300px;
+      }
+
+      .category-card img {
+        transition: transform 0.5s ease;
+      }
+
+      .category-card:hover img {
+        transform: scale(1.1);
+      }
+
+      .category-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+        color: white;
+        padding: 30px 20px 20px;
+      }
+
+      /* Responsive Masonry Grid */
+      .masonry-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-auto-rows: 150px;
+        grid-gap: 6px;
+        grid-auto-flow: dense;
+      }
+
+      @media (max-width: 768px) {
+        .masonry-grid {
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+          grid-auto-rows: 120px;
+          grid-gap: 4px;
+        }
+
+        .masonry-item-wide {
+          grid-column-end: span 1 !important;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .masonry-grid {
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          grid-auto-rows: 100px;
+        }
+
+        .masonry-item-large {
+          grid-row-end: span 2;
+        }
+
+        .masonry-item-medium {
+          grid-row-end: span 1;
+        }
+      }
+
+      .masonry-item {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .masonry-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+
+      .masonry-item:hover img {
+        transform: scale(1.1);
+      }
+
+      .masonry-item-small {
+        grid-row-end: span 1;
+      }
+
+      .masonry-item-medium {
+        grid-row-end: span 2;
+      }
+
+      .masonry-item-large {
+        grid-row-end: span 3;
+      }
+
+      .masonry-item-wide {
+        grid-column-end: span 2;
+      }
+
+      /* Custom scrollbar for branch list */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f8fafc;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #cbd5e1;
+      }
+
+      /* Zoom hover effect */
+      .zoom-hover {
+        transition: transform 0.3s ease;
+      }
+
+      .zoom-hover:hover {
+        transform: scale(1.05);
+      }
+
+      /* Branch card styles */
+      .branch-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f1f1f1;
+        transition: all 0.3s ease;
+      }
+
+      .branch-card:hover {
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        border-color: #fbcfe8;
+        transform: translateY(-2px);
+      }
+
+      /* Responsive map adjustments */
+      @media (max-width: 640px) {
+        .map-container {
+          height: 300px;
+          border-radius: 0.75rem;
+        }
+      }
+      /* custom markers pulse slightly*/
+      @keyframes pulsate {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .custom-pin svg {
+        filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.3));
+        animation: pulsate 2s infinite ease-in-out;
+      }
+
+      /* Ensure the popup looks modern */
+      .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        padding: 5px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      /* Style for each row in the mobile menu */
+.mobile-link {
+    
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+}
+
+/* Ensure the parent header is relative so 'absolute' positioning works */
+.sticky-header {
+    position: relative;
+}
+
+/* Animation for the dropdown */
+#mobileMenu:not(.hidden) {
+    display: block;
+    animation: slideDown 0.3s ease-out forwards;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* Custom class to hide the inactive language */
+.lang-hidden {
+    display: none !important;
+}
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Language Toggle Button -->
+    <div class="lang-toggle float-animation" id="langToggle">
+      <span class="ar-text">EN</span>
+      <span class="en-text lang-hidden " >AR</span>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky-header bg-white py-4 px-4 md:px-6 shadow-md">
+      <div class="container mx-auto flex justify-between items-center">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <div
+            class="bg-pink-600 w-10 h-10 rounded-full flex items-center justify-center"
+          >
+            <img src="/image/p-replace-color.png" alt="logo" />
+          </div>
+          <h1 class="text-2xl font-bold text-gray-800 ml-3 mr-3 ar-text">
+            إلين
+          </h1>
+          <h1
+            class="text-2xl font-bold text-gray-800 mr-3 en-text lang-hidden "
+            
+          >
+            Elin
+          </h1>
+          <span
+            class="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded ar-text"
+            >للأزياء النسائية</span
+          >
+          <span
+            class="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded en-text lang-hidden "
+            
+            >Women's Fashion</span
+          >
+        </div>
+
+        <!-- Navigation -->
+<nav class="hidden md:flex space-x-6 items-center ar-text">
+    <a href="#home" class="text-gray-800 ml-4 hover:text-pink-600 transition font-semibold">الرئيسية</a>
+    <a href="#about" class="text-gray-800 hover:text-pink-600 transition font-semibold">من نحن</a>
+    <a href="#categories" class="text-gray-800 hover:text-pink-600 transition font-semibold">فئاتنا</a>
+    <a href="#gallery" class="text-gray-800 hover:text-pink-600 transition font-semibold">معرض المنتجات</a>
+    <a href="#branches" class="text-gray-800 hover:text-pink-600 transition font-semibold">فروعنا</a>
+    <a href="#contact" class="text-gray-800 hover:text-pink-600 transition font-semibold">اتصل بنا</a>
+</nav>
+
+<nav class="hidden md:flex space-x-6 items-center en-text lang-hidden " >
+    <a href="#home" class="text-gray-800 hover:text-pink-600 transition font-semibold">Home</a>
+    <a href="#about" class="text-gray-800 hover:text-pink-600 transition font-semibold">About</a>
+    <a href="#categories" class="text-gray-800 hover:text-pink-600 transition font-semibold">Categories</a>
+    <a href="#gallery" class="text-gray-800 hover:text-pink-600 transition font-semibold">Product Gallery</a>
+    <a href="#branches" class="text-gray-800 hover:text-pink-600 transition font-semibold">Branches</a>
+    <a href="#contact" class="text-gray-800 hover:text-pink-600 transition font-semibold">Contact</a>
+</nav>
+  <!-- Mobile menu button -->
+
+        <div class="md:hidden">
+
+          <button id="mobileMenuBtn" class="text-gray-800 focus:outline-none">
+
+            <i class="fas fa-bars text-xl"></i>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- Mobile menu -->
+      <div
+  id="mobileMenu"
+  class="hidden md:hidden absolute left-4 right-4 top-20 bg-white shadow-xl rounded-2xl p-2 z-[1000] border border-gray-100"
+>
+  <div class="flex flex-col ar-text">
+    <a href="#home" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">الرئيسية</a>
+    <a href="#about" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">من نحن</a>
+    <a href="#categories" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">فئاتنا</a>
+    <a href="#gallery" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">معرض المنتجات</a>
+    <a href="#branches" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">فروعنا</a>
+    <a href="#contact" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">اتصل بنا</a>
+  </div>
+
+  <div class="flex flex-col en-text lang-hidden " >
+    <a href="#home" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">Home</a>
+    <a href="#about" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">About</a>
+    <a href="#categories" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">Categories</a>
+    <a href="#gallery" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">Product Gallery</a>
+    <a href="#branches" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">Branches</a>
+    <a href="#contact" class="block w-full px-4 py-3 text-gray-800 hover:text-pink-600 hover:bg-pink-50 transition-all font-semibold border-b border-gray-50 last:border-0 rounded-lg">Contact</a>
+  </div>
+</div>
+    </header>
+
+    <main>
+      <!-- Hero Section -->
+      <section
+        id="home"
+        class="relative overflow-hidden hero-gradient py-16 px-4 md:px-6"
+      >
+        <div class="container mx-auto flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 mb-10 md:mb-0">
+            <span
+              class="inline-block px-4 py-1 rounded-full bg-pink-100 text-pink-600 font-bold text-sm mb-4 en-text lang-hidden "
+              
+              >New Arrivals</span
+            >
+
+            <h2
+              class="text-3xl md:text-5xl font-black text-gray-900 mb-6 leading-tight ar-text"
+            >
+              أزياء تجسد <span class="text-pink-600">أناقتك</span> الراقية
+            </h2>
+            <h2
+              class="text-3xl md:text-5xl font-black text-gray-900 mb-6 leading-tight en-text lang-hidden "
+              
+            >
+              Fashion That <span class="text-pink-600">Embodies</span> Your
+              Elegance
+            </h2>
+
+            <p class="text-gray-600 text-base md:text-lg mb-8 max-w-lg ar-text">
+              اكتشفي مجموعتنا الحصرية التي تجمع بين التصاميم العصرية والجودة
+              العالمية. تألقي في كل مناسبة بلمسة "إلين" الساحرة.
+            </p>
+            <p
+              class="text-gray-600 text-base md:text-lg mb-8 max-w-lg en-text lang-hidden "
+              
+            >
+              Discover our exclusive collection that combines modern designs
+              with international quality. Shine on every occasion with the
+              charming touch of "Elin".
+            </p>
+
+            <div class="flex flex-row gap-4 mb-8">
+              <a
+                href="#categories"
+                class="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 text-center ar-text"
+                >ابرز الأزياء</a
+              >
+              <a
+                href="#branches"
+                class="bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-100 px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-1 text-center ar-text"
+                >زيارة الفروع</a
+              >
+
+              <a
+                href="#categories"
+                class="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 text-center en-text lang-hidden "
+                
+                >Latest Fashions</a
+              >
+              <a
+                href="#branches"
+                class="bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-100 px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-1 text-center en-text lang-hidden "
+                
+                >Our Branches</a
+              >
+            </div>
+
+            <!-- Social Icons in Hero -->
+            <div class="flex gap-4">
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-pink-600 hover:bg-pink-600 hover:text-white transition-all"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-pink-600 hover:bg-pink-600 hover:text-white transition-all"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a
+                href="#"
+                class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-pink-600 hover:bg-pink-600 hover:text-white transition-all"
+                ><i class="fab fa-twitter"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="md:w-1/2 relative">
+            <div class="relative">
+              <img
+                src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+                alt="أزياء نسائية"
+                class="rounded-2xl shadow-2xl w-full h-64 md:h-96 object-cover"
+              />
+
+              <!-- Floating elements -->
+              <div
+                class="absolute -top-3 -right-3 bg-white p-3 rounded-xl shadow-lg float-animation hidden md:block"
+              >
+                <div class="text-pink-600 text-center">
+                  <span class="block text-xl font-bold ar-text">عروض</span>
+                  <span class="block text-xs ar-text">حصرية</span>
+                  <span class="block text-xl font-bold en-text lang-hidden " 
+                    >Exclusive </span>
+                  <span class="block text-xs en-text lang-hidden " 
+                    >offers</span
+                  >
+                </div>
+              </div>
+
+              <div
+                class="absolute -bottom-3 -left-3 bg-white p-3 rounded-xl shadow-lg float-animation hidden md:block"
+                style="animation-delay: 0.5s"
+              >
+                <div class="text-gray-800 text-center">
+                  <span class="block text-xl font-bold ar-text">جديد</span>
+                  <span
+                    class="block text-xl font-bold en-text lang-hidden "
+                    
+                    >New</span
+                  >
+                  <span class="block text-xs ar-text">المجموعة</span>
+                  <span class="block text-xs en-text lang-hidden " 
+                    >Collection</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Wave divider -->
+        <div class="absolute bottom-0 left-0 w-full overflow-hidden">
+          <svg
+            viewBox="0 0 1200 120"
+            preserveAspectRatio="none"
+            class="relative block w-full h-12 md:h-16"
+          >
+            <path
+              d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+              fill="white"
+            ></path>
+          </svg>
+        </div>
+      </section>
+
+      <!-- About Section -->
+      <section id="about" class="py-16 md:py-20 px-4 md:px-6 bg-white">
+        <div class="container mx-auto">
+          <div class="text-center mb-12 md:mb-16">
+            <h2
+              class="text-2xl md:text-4xl font-bold text-gray-800 mb-4 ar-text"
+            >
+              من نحن
+            </h2>
+            <h2
+              class="text-2xl md:text-4xl font-bold text-gray-800 mb-4 en-text lang-hidden "
+              
+            >
+              About Us
+            </h2>
+
+            <div class="w-20 h-1 bg-pink-600 mx-auto mb-6"></div>
+
+            <p
+              class="text-gray-600 max-w-2xl mx-auto text-base md:text-lg ar-text"
+            >
+              "إلين" هو وجهتك الأولى للموضة النسائية العصرية. منذ تأسيسنا في عام
+              2012، كنا نهدف إلى تقديم أرقى التصاميم التي تجمع بين الأناقة
+              والراحة.
+            </p>
+            <p
+              class="text-gray-600 max-w-2xl mx-auto text-base md:text-lg en-text lang-hidden "
+              
+            >
+              "Elin" is your first destination for modern women's fashion. Since
+              our establishment in 2012, we have aimed to provide the finest
+              designs that combine elegance and comfort.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
+            <div
+              class="bg-pink-50 p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition text-center zoom-hover"
+            >
+              <div
+                class="bg-pink-600 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6"
+              >
+                <i class="fas fa-crown text-white text-xl md:text-2xl"></i>
+              </div>
+              <h3
+                class="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4 ar-text"
+              >
+                جودة عالية
+              </h3>
+              <h3
+                class="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4 en-text lang-hidden "
+                
+              >
+                High Quality
+              </h3>
+              <p class="text-gray-600 text-sm md:text-base ar-text">
+                نحرص على اختيار أفضل الأقمشة والمواد لضمان راحتك ورضاك. جودة
+                منتجاتنا هي أولويتنا القصوى.
+              </p>
+              <p
+                class="text-gray-600 text-sm md:text-base en-text lang-hidden "
+                
+              >
+                We are keen to choose the best fabrics and materials to ensure
+                your comfort and satisfaction. The quality of our products is
+                our top priority.
+              </p>
+            </div>
+
+            <div
+              class="bg-pink-50 p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition text-center zoom-hover"
+            >
+              <div
+                class="bg-pink-600 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6"
+              >
+                <i class="fas fa-tags text-white text-xl md:text-2xl"></i>
+              </div>
+              <h3
+                class="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4 ar-text"
+              >
+                أسعار مناسبة
+              </h3>
+              <h3
+                class="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4 en-text lang-hidden "
+                
+              >
+                Affordable Prices
+              </h3>
+              <p class="text-gray-600 text-sm md:text-base ar-text">
+                نؤمن بأن الموضة الراقية يجب أن تكون في متناول الجميع، لذلك نقدم
+                أسعارًا تنافسية مع الحفاظ على الجودة العالية.
+              </p>
+              <p
+                class="text-gray-600 text-sm md:text-base en-text lang-hidden "
+                
+              >
+                We believe that high-end fashion should be accessible to
+                everyone, so we offer competitive prices while maintaining high
+                quality.
+              </p>
+            </div>
+
+            <div
+              class="bg-pink-50 p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition text-center zoom-hover"
+            >
+              <div
+                class="bg-pink-600 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6"
+              >
+                <i class="fas fa-star text-white text-xl md:text-2xl"></i>
+              </div>
+              <h3
+                class="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4 ar-text"
+              >
+                تصاميم عصرية
+              </h3>
+              <h3
+                class="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4 en-text lang-hidden "
+                
+              >
+                Modern Designs
+              </h3>
+              <p class="text-gray-600 text-sm md:text-base ar-text">
+                فريق التصميم لدينا يتابع أحدث صيحات الموضة العالمية ليقدم لكِ
+                تشكيلة مميزة تناسب ذوقك العصري.
+              </p>
+              <p
+                class="text-gray-600 text-sm md:text-base en-text lang-hidden "
+                
+              >
+                Our design team follows the latest global fashion trends to
+                provide you with a distinctive collection that suits your modern
+                taste.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories Section -->
+      <section id="categories" class="py-16 md:py-20 px-4 md:px-6 bg-gray-50">
+        <div class="container mx-auto">
+          <div class="text-center mb-12 md:mb-16">
+            <h2
+              class="text-2xl md:text-4xl font-bold text-gray-800 mb-4 ar-text"
+            >
+              فئات المنتجات
+            </h2>
+            <h2
+              class="text-2xl md:text-4xl font-bold text-gray-800 mb-4 en-text lang-hidden "
+              
+            >
+              Product Categories
+            </h2>
+
+            <div class="w-20 h-1 bg-pink-600 mx-auto mb-6"></div>
+
+            <p
+              class="text-gray-600 max-w-2xl mx-auto text-base md:text-lg ar-text"
+            >
+              اكتشف مجموعتنا المتنوعة من الملابس النسائية المصنفة حسب المناسبات
+              والاستخدامات.
+            </p>
+            <p
+              class="text-gray-600 max-w-2xl mx-auto text-base md:text-lg en-text lang-hidden "
+              
+            >
+              Discover our diverse collection of women's clothing categorized by
+              occasions and uses.
+            </p>
+          </div>
+
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
+          >
+            <!-- Category 1 -->
+            <div
+              class="category-card shadow-lg hover:shadow-xl transition cursor-pointer zoom-hover"
+            >
+              <img
+                src="https://www.cotzl.com/uploads/products_cats/t/64.jpg"
+                alt="مستلزمات العرائس"
+                class="w-full h-full object-cover"
+              />
+              <div class="category-overlay">
+                <h3 class="text-xl md:text-2xl font-bold mb-2 ar-text">
+                  مستلزمات العرائس
+                </h3>
+                <h3
+                  class="text-xl md:text-2xl font-bold mb-2 en-text lang-hidden "
+                  
+                >
+                  Bridal Wear
+                </h3>
+                <p class="text-xs md:text-sm ar-text">
+                  مجموعة فاخرة ومميزة لليلة العمر
+                </p>
+                <p class="text-xs md:text-sm en-text lang-hidden " >
+                  Luxurious and exclusive collection for the big day
+                </p>
+              </div>
+            </div>
+
+            <!-- Category 2 -->
+            <div
+              class="category-card shadow-lg hover:shadow-xl transition cursor-pointer zoom-hover"
+            >
+              <img
+                src="./image/womenclothes.jpg"
+                alt="الملابس النسائية"
+                class="w-full h-full object-cover"
+              />
+              <div class="category-overlay">
+                <h3 class="text-xl md:text-2xl font-bold mb-2 ar-text">
+                  الملابس النسائية
+                </h3>
+                <h3
+                  class="text-xl md:text-2xl font-bold mb-2 en-text lang-hidden "
+                  
+                >
+                  Women's Clothing
+                </h3>
+                <p class="text-xs md:text-sm ar-text">
+                  تشكيلة واسعة من الملابس اليومية والعصرية
+                </p>
+                <p class="text-xs md:text-sm en-text lang-hidden " >
+                  Wide range of daily and fashionable clothing
+                </p>
+              </div>
+            </div>
+
+            <!-- Category 3 -->
+            <div
+              class="category-card shadow-lg hover:shadow-xl transition cursor-pointer zoom-hover"
+            >
+              <img
+                src="./image/underware.jpg"
+                alt="الملابس الداخلية"
+                class="w-full h-full object-cover"
+              />
+              <div class="category-overlay">
+                <h3 class="text-xl md:text-2xl font-bold mb-2 ar-text">
+                  الملابس الداخلية
+                </h3>
+                <h3
+                  class="text-xl md:text-2xl font-bold mb-2 en-text lang-hidden "
+                  
+                >
+                  Lingerie
+                </h3>
+                <p class="text-xs md:text-sm ar-text">
+                  أناقة وراحة مع تشكيلة متنوعة من الدرجة الأولى
+                </p>
+                <p class="text-xs md:text-sm en-text lang-hidden " >
+                  Elegance and comfort with a variety of first-class options
+                </p>
+              </div>
+            </div>
+
+            <!-- Category 4 -->
+            <div
+              class="category-card shadow-lg hover:shadow-xl transition cursor-pointer zoom-hover"
+            >
+              <img
+                src="./image/cloth.jpg"
+                alt="ملابس المناسبات"
+                class="w-full h-full object-cover"
+              />
+              <div class="category-overlay">
+                <h3 class="text-xl md:text-2xl font-bold mb-2 ar-text">
+                  ملابس المناسبات
+                </h3>
+                <h3
+                  class="text-xl md:text-2xl font-bold mb-2 en-text lang-hidden "
+                  
+                >
+                  Occasion Wear
+                </h3>
+                <p class="text-xs md:text-sm ar-text">
+                  فساتين وتنورات للمناسبات الخاصة والحفلات
+                </p>
+                <p class="text-xs md:text-sm en-text lang-hidden " >
+                  Dresses and skirts for special occasions and parties
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Masonry Grid Gallery Section (H&M Style - RANDOM) -->
+      <!-- Masonry Grid Gallery Section (H&M Style - RANDOM) -->
+      <section id="gallery" class="py-20 px-6 bg-white">
+        <div class="container mx-auto">
+          <div class="text-center mb-16">
+            <h2
+              class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 ar-text"
+            >
+              معرض المنتجات
+            </h2>
+            <h2
+              class="text-3xl md:text-4xl font-bold text-gray-800 mb-4 en-text lang-hidden "
+              
+            >
+              Product Gallery
+            </h2>
+
+            <div class="w-20 h-1 bg-pink-600 mx-auto mb-6"></div>
+
+            <p class="text-gray-600 max-w-2xl mx-auto text-lg ar-text">
+              استعرض أحدث منتجاتنا وعروضنا الخاصة بتصميم شبكي عشوائي يشبه أفضل
+              المتاجر العالمية.
+            </p>
+            <p
+              class="text-gray-600 max-w-2xl mx-auto text-lg en-text lang-hidden "
+              
+            >
+              Browse our latest products and special offers in a random grid
+              design similar to the best international stores.
+            </p>
+          </div>
+
+          <!-- Masonry Grid -->
+          <div class="masonry-grid">
+            <!-- Item 1 - Large -->
+            <div class="masonry-item masonry-item-large masonry-item-wide">
+              <img src="./image/9.jpg" alt="أزياء نسائية" />
+            </div>
+
+            <!-- Item 2 - Medium -->
+            <div class="masonry-item masonry-item-medium">
+              <img src="./image/1.jpg" alt="فساتين سهرة" />
+            </div>
+
+            <!-- Item 3 - Small -->
+            <div class="masonry-item masonry-item-small">
+              <img src="./image/4.jpg" alt="ملابس داخلية" />
+            </div>
+
+            <!-- Item 4 - Medium -->
+            <div class="masonry-item masonry-item-medium">
+              <img src="./image/3.jpg" alt="جينز نسائي" />
+            </div>
+
+            <!-- Item 5 - Small -->
+            <div class="masonry-item masonry-item-small">
+              <img src="./image/cloth.jpg" alt="ملابس منزلية" />
+            </div>
+
+            <!-- Item 6 - Medium Wide -->
+            <div class="masonry-item masonry-item-medium masonry-item-wide">
+              <img src="./image/5.jpg" alt="ملابس رياضية" />
+            </div>
+
+            <!-- Item 7 - Small -->
+            <div class="masonry-item masonry-item-small">
+              <img src="./image/6.jpg" alt="إكسسوارات" />
+            </div>
+
+            <!-- Item 8 - Large -->
+            <div class="masonry-item masonry-item-large">
+              <img src="./image/7.jpg" alt="ملابس بحر" />
+            </div>
+            <div class="masonry-item masonry-item-small">
+              <img src="./image/2.jpg" alt="فساتين سهرة" />
+            </div>
+            <!-- Item 8 - Large -->
+            <div class="masonry-item masonry-item-large">
+              <img src="./image/10.jpg" alt="ملابس بحر" />
+            </div>
+
+            <!-- Item 6 - Medium Wide -->
+            <div class="masonry-item masonry-item-medium masonry-item-wide">
+              <img src="./image/11.jpg" alt="ملابس رياضية" />
+            </div>
+
+            <!-- Item 8 - Large -->
+            <div class="masonry-item masonry-item-medium">
+              <img src="./image/12.jpg" alt="ملابس بحر" />
+            </div>
+            <!-- Item 2 - Medium -->
+            <!-- Item 6 - Medium Wide -->
+            <div class="masonry-item masonry-item-medium masonry-item-wide">
+              <img src="./image/14.jpg" alt="ملابس رياضية" />
+            </div>
+            <div class="masonry-item masonry-item-small">
+              <img src="./image/13.jpg" alt="ملابس داخلية" />
+            </div>
+          </div>
+
+          <!-- Gallery description -->
+          <div class="text-center max-w-3xl mx-auto mt-16">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 ar-text">
+              عرض خاص لفصل الصيف
+            </h3>
+            <h3
+              class="text-2xl font-bold text-gray-800 mb-6 en-text lang-hidden "
+              
+            >
+              Special Summer Collection
+            </h3>
+
+            <p class="text-gray-600 text-lg mb-8 ar-text">
+              استمتعي بتشكيلتنا الصيفية المميزة التي تجمع بين الأناقة والراحة.
+              تصاميم عصرية تناسب جميع المناسبات الصيفية، من الملابس الخفيفة
+              للنهار إلى فساتين السهرة للاحتفالات.
+            </p>
+            <p class="text-gray-600 text-lg mb-8 en-text lang-hidden " >
+              Enjoy our exclusive summer collection that combines elegance and
+              comfort. Modern designs suitable for all summer occasions, from
+              light daywear to evening dresses for celebrations.
+            </p>
+
+            <a
+              href="#categories"
+              class="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 rounded-full font-semibold transition shadow-lg hover:shadow-xl text-lg ar-text"
+              >استعرض جميع الفئات</a
+            >
+            <a
+              href="#categories"
+              class="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 rounded-full font-semibold transition shadow-lg hover:shadow-xl text-lg en-text lang-hidden "
+              
+              >Browse All Categories</a
+            >
+          </div>
+        </div>
+      </section>
+      <section id="branches" class="py-16 px-4 md:px-8">
+        <div class="max-w-7xl mx-auto">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-4">
+              <span class="ar-text">فروعنا</span>
+              <span class="en-text lang-hidden ">Our Branches</span>
+            </h2>
+            <div class="w-16 h-1 bg-pink-600 mx-auto rounded-full"></div>
+          </div>
+
+          <div class="flex flex-wrap justify-center gap-2 mb-8" id="city-tabs">
+            <button
+              class="city-tab active border px-5 py-2 rounded-full bg-white text-sm font-bold"
+              data-city="all"
+            >
+              <span class="ar-text">الكل</span
+              ><span class="en-text lang-hidden ">All Locations</span>
+            </button>
+            <button
+              class="city-tab border px-5 py-2 rounded-full bg-white text-sm font-bold"
+              data-city="benghazi"
+            >
+              <span class="ar-text">بنغازي</span
+              ><span class="en-text lang-hidden ">Benghazi</span>
+            </button>
+            <button
+              class="city-tab border px-5 py-2 rounded-full bg-white text-sm font-bold"
+              data-city="albyda"
+            >
+                  <span class="ar-text">البيضاء</span>
+              <span class="en-text lang-hidden ">albayda</span>
+            </button>
+            <button
+              class="city-tab border px-5 py-2 rounded-full bg-white text-sm font-bold"
+              data-city="ajdabiya"
+            >
+              <span class="ar-text">إجدابيا  </span>
+              <span class="en-text lang-hidden ">Ajdabiya</span>
+            </button>
+            <button
+              class="city-tab border px-5 py-2 rounded-full bg-white text-sm font-bold"
+              data-city="tobruk"
+            >
+              <span class="ar-text">طبرق</span
+              ><span class="en-text lang-hidden ">Tobruk</span>
+            </button>
+            <button
+              class="city-tab border px-5 py-2 rounded-full bg-white text-sm font-bold"
+              data-city="derna"
+            >
+              <span class="ar-text">درنة</span
+              ><span class="en-text lang-hidden ">Derna</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-5 order-2 lg:order-1">
+              <div
+                id="branch-list-container"
+                class="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar p-1"
+              ></div>
+            </div>
+
+            <div class="lg:col-span-7 order-1 lg:order-2">
+              <div id="map" class="shadow-2xl border-8 border-white"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+      <!-- Contact Section -->
+      <section
+        id="contact"
+        class="py-16 md:py-20 px-4 md:px-6 bg-gradient-to-r from-pink-50 to-white"
+      >
+        <div class="container mx-auto">
+          <div class="text-center mb-12 md:mb-16">
+            <h2
+              class="text-2xl md:text-4xl font-bold text-gray-800 mb-4 ar-text"
+            >
+              تواصل معنا
+            </h2>
+            <h2
+              class="text-2xl md:text-4xl font-bold text-gray-800 mb-4 en-text lang-hidden "
+              
+            >
+              Contact Us
+            </h2>
+
+            <div class="w-20 h-1 bg-pink-600 mx-auto mb-6"></div>
+
+            <p
+              class="text-gray-600 max-w-2xl mx-auto text-base md:text-lg ar-text"
+            >
+              نرحب باستفساراتك وآرائك. فريق خدمة العملاء لدينا جاهز لمساعدتك على
+              مدار الساعة.
+            </p>
+            <p
+              class="text-gray-600 max-w-2xl mx-auto text-base md:text-lg en-text lang-hidden "
+              
+            >
+              We welcome your inquiries and opinions. Our customer service team
+              is ready to help you around the clock.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+            <!-- Contact Info -->
+            <div>
+              <div class="bg-white rounded-2xl p-6 md:p-8 shadow-lg h-full">
+                <h3
+                  class="text-xl md:text-2xl font-bold text-gray-800 mb-6 ar-text"
+                >
+                  معلومات الاتصال
+                </h3>
+                <h3
+                  class="text-xl md:text-2xl font-bold text-gray-800 mb-6 en-text lang-hidden "
+                  
+                >
+                  Contact Information
+                </h3>
+
+                <div class="space-y-6">
+                  <div class="flex items-center">
+                    <div
+                      class="bg-pink-100 text-pink-600 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center me-4"
+                    >
+                      <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-gray-800 ar-text">
+                        رقم الهاتف
+                      </h4>
+                      <h4
+                        class="font-bold text-gray-800 en-text lang-hidden "
+                        
+                      >
+                        Phone Number
+                      </h4>
+                    <p class="text-gray-600" dir="ltr">
+                       <a href="tel:+218921901996" class="hover:text-pink-600">+218 92 190 1996</a> </p>
+                     <p class="text-gray-600" dir="ltr">
+                       <a href="tel:+218913901996" class="hover:text-pink-600">+218 91 390 1996</a> </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center">
+                    <div
+                      class="bg-pink-100 text-pink-600 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center me-4"
+                    >
+                      <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-gray-800 ar-text">
+                        البريد الإلكتروني
+                      </h4>
+                      <h4
+                        class="font-bold text-gray-800 en-text lang-hidden "
+                        
+                      >
+                        Email Address
+                      </h4>
+                      <p class="text-gray-600">info@elin.ly</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center">
+                    <div
+                      class="bg-pink-100 text-pink-600 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center me-4"
+                    >
+                      <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-gray-800 ar-text">الموقع</h4>
+                      <h4
+                        class="font-bold text-gray-800 en-text lang-hidden "
+                        
+                      >
+                        Location
+                      </h4>
+                      <p class="text-gray-600 ar-text">
+                        المقر الرئيسي : البيضاء - خلف البريد القديم بجوار مسجد بوقويطين 
+                      </p>
+                      <p class="text-gray-600 en-text lang-hidden " >
+                        Head Office: Al Bayda - Behind the old post office, next to Bouguitin Mosque
+                      </p>
+                    </div>
+                  </div>
+                   <div class="flex items-center">
+                    <div
+                      class="bg-pink-100 text-pink-600 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center me-4"
+                    >
+                      <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-gray-800 ar-text">
+                        ساعات العمل
+                      </h4>
+                      <h4
+                        class="font-bold text-gray-800 en-text lang-hidden "
+                        
+                      >
+                        working hours
+                      </h4>
+                       <div class="space-y-2">
+                  <div class="flex justify-between gap-6">
+                    <span class="text-gray-600 ar-text" id="work-day-txt"
+                      >السبت - الخميس</span
+                    >
+                    <span class="text-gray-600 en-text lang-hidden" id="work-day-txt"
+                      >Saturday - Thursday</span
+                    >
+                    <span class="font-medium ar-text"
+                      >  10:00 ص - 9:00 م</span
+                    >
+                      <span class="font-medium en-text lang-hidden"
+                      > 10:00 AM - 9:00 PM</span
+                    >
+                  </div>
+                     <div class="flex justify-between">
+                    <span class="text-gray-600 ar-text" id="friday-txt">الجمعة</span>
+                    <span class="text-gray-600 en-text lang-hidden" id="friday-txt">Friday</span>
+                    <span class="font-medium ar-text"
+                      > 9:00 ص - 4:00 م</span
+                    >
+                      <span class="font-medium en-text lang-hidden"
+                      > 4:00 PM - 9:00 PM</span>
+                  </div>
+                    </div>
+                  </div>
+
+                </div>
+                  <div class="pt-6">
+                    <h4 class="font-bold text-gray-800 mb-4 ar-text">
+                      تابعنا على وسائل التواصل
+                    </h4>
+                    <h4
+                      class="font-bold text-gray-800 mb-4 en-text lang-hidden "
+                      
+                    >
+                      Follow us on social media
+                    </h4>
+                    <div class="flex space-x-4 ar-text:space-x-reverse">
+                      <a
+                        href="#"
+                        class="bg-pink-600 ml-3 hover:bg-pink-700 text-white w-10 h-10 rounded-full flex items-center justify-center"
+                      >
+                        <i class="fab fa-instagram"></i>
+                      </a>
+                      <a
+                        href="#"
+                        class="bg-pink-600 hover:bg-pink-700 text-white w-10 h-10 rounded-full flex items-center justify-center"
+                      >
+                        <i class="fab fa-twitter"></i>
+                      </a>
+                      <a
+                        href="#"
+                        class="bg-pink-600 hover:bg-pink-700 text-white w-10 h-10 rounded-full flex items-center justify-center"
+                      >
+                        <i class="fab fa-snapchat"></i>
+                      </a>
+                      <a
+                        href="#"
+                        class="bg-pink-600 hover:bg-pink-700 text-white w-10 h-10 rounded-full flex items-center justify-center"
+                      >
+                        <i class="fab fa-tiktok"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div>
+              <div class="bg-white rounded-2xl p-6 md:p-8 shadow-lg h-full">
+                <h3
+                  class="text-xl md:text-2xl font-bold text-gray-800 mb-6 ar-text"
+                >
+                  أرسل رسالة
+                </h3>
+                <h3
+                  class="text-xl md:text-2xl font-bold text-gray-800 mb-6 en-text lang-hidden "
+                  
+                >
+                  Send a Message
+                </h3>
+
+                <form id="contactForm">
+                  <div class="mb-4 md:mb-6">
+                    <label class="block text-gray-700 mb-2 ar-text"
+                      >الاسم</label
+                    >
+                    <label
+                      class="block text-gray-700 mb-2 en-text lang-hidden "
+                      
+                      >Name</label
+                    >
+                    <input
+                      type="text"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-600"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-4 md:mb-6">
+                    <label class="block text-gray-700 mb-2 ar-text"
+                      >البريد الإلكتروني</label
+                    >
+                    <label
+                      class="block text-gray-700 mb-2 en-text lang-hidden "
+                      
+                      >Email</label
+                    >
+                    <input
+                      type="email"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-600"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-4 md:mb-6">
+                    <label class="block text-gray-700 mb-2 ar-text"
+                      >الرسالة</label
+                    >
+                    <label
+                      class="block text-gray-700 mb-2 en-text lang-hidden "
+                      
+                      >Message</label
+                    >
+                    <textarea
+                      rows="4"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-600"
+                      required
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    class="bg-pink-600 hover:bg-pink-700 text-white w-full py-3 rounded-lg font-semibold transition ar-text"
+                  >
+                    إرسال الرسالة
+                  </button>
+                  <button
+                    type="submit"
+                    class="bg-pink-600 hover:bg-pink-700 text-white w-full py-3 rounded-lg font-semibold transition en-text lang-hidden "
+                    
+                  >
+                    Send Message
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+<footer class="bg-gray-800 text-white py-12 px-4 md:px-6">
+  <div class="container mx-auto">
+    <!-- Main row -->
+    <div class="flex flex-col space-y-8 md:flex-row md:space-y-0 md:gap-10">
+      
+      <!-- Group 1: Block 1 -->
+
+<div class="flex-1 md:mr-10 rtl:md:ml-10">
+  <!-- Logo + brand name -->
+  <div class="flex items-center mb-6">
+    <div class="w-12 h-12 flex items-center justify-center">
+      <img src="./image/logo.png" alt="logo" />
+    </div>
+    <h2 class="text-2xl font-bold ms-3 ar-text">إلين</h2>
+    <h2 class="text-2xl font-bold ms-3 en-text lang-hidden">Elin</h2>
+  </div>
+
+  <!-- Brand description -->
+  <p class="text-gray-400 text-sm md:text-base ar-text mb-6">
+    وجهتك الأولى للموضة النسائية العصرية. نقدم أجمل التصاميم وأرقى
+    الأقمشة بأسعار تنافسية.
+  </p>
+  <p class="text-gray-400 text-sm md:text-base en-text lang-hidden mb-6">
+    Your first destination for modern women's fashion. We offer the
+    most beautiful designs and finest fabrics at competitive prices.
+  </p>
+
+<!-- License / registration info -->
+<div class="mt-6 space-y-2">
+  <!-- License -->
+  <div class="flex items-center border-b border-gray-600 pb-1">
+    <!-- Certificate Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" 
+         class="h-4 w-4 text-pink-500 mr-2" 
+         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2z" />
+    </svg>
+    <p class="text-gray-400 text-xs md:text-sm ar-text">رقم الرخصة : 3446000335</p>
+    <p class="text-gray-400 text-xs md:text-sm en-text lang-hidden">License Number: 3446000335</p>
+  </div>
+
+  <!-- Commercial Registration -->
+  <div class="flex items-center border-b border-gray-600 pb-1">
+    <!-- Building Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" 
+         class="h-4 w-4 text-pink-500 mr-2" 
+         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M3 21h18M9 21V9h6v12M12 3v6" />
+    </svg>
+    <p class="text-gray-400 text-xs md:text-sm ar-text">رقم السجل التجاري : 3446</p>
+    <p class="text-gray-400 text-xs md:text-sm en-text lang-hidden">Commercial Registration Number: 3446</p>
+  </div>
+
+  <!-- Tax -->
+  <div class="flex items-center border-b border-gray-600 pb-1">
+    <!-- Currency Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" 
+         class="h-4 w-4 text-pink-500 mr-2" 
+         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M12 8c-1.657 0-3 1.343-3 3h6c0-1.657-1.343-3-3-3zM12 16c1.657 0 3-1.343 3-3H9c0 1.657 1.343 3 3 3z" />
+    </svg>
+    <p class="text-gray-400 text-xs md:text-sm ar-text">الرقم الضريبي : 1886</p>
+    <p class="text-gray-400 text-xs md:text-sm en-text lang-hidden">Tax Number: 1886</p>
+  </div>
+
+  <!-- Chamber of Commerce -->
+  <div class="flex items-center border-b border-gray-600 pb-1">
+    <!-- Bank Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" 
+         class="h-4 w-4 text-pink-500 mr-2" 
+         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M3 10h18M6 21h12M4 6h16l-8-4-8 4z" />
+    </svg>
+    <p class="text-gray-400 text-xs md:text-sm ar-text">القيد بغرفة التجارة والصناعة : 221</p>
+    <p class="text-gray-400 text-xs md:text-sm en-text lang-hidden">Registration with the Chamber of Commerce</p>
+  </div>
+</div>
+
+
+
+
+</div>
+
+
+      <!-- Group 2: Block 2 + Block 3 -->
+      <div class="flex flex-1 gap-12 ">
+        <!-- Block 2 -->
+        <div class="flex-1">
+          <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6 ar-text">روابط سريعة</h3>
+          <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6 en-text lang-hidden">Quick Links</h3>
+          <ul class="space-y-2 md:space-y-3">
+            <li><a href="#home" class="text-gray-400 hover:text-white transition text-sm md:text-base ar-text">الرئيسية</a></li>
+            <li><a href="#categories" class="text-gray-400 hover:text-white transition text-sm md:text-base ar-text">فئات المنتجات</a></li>
+            <li><a href="#gallery" class="text-gray-400 hover:text-white transition text-sm md:text-base ar-text">معرض المنتجات</a></li>
+            <li><a href="#branches" class="text-gray-400 hover:text-white transition text-sm md:text-base ar-text">فروعنا</a></li>
+          </ul>
+          <ul class="space-y-2 md:space-y-3 en-text lang-hidden">
+            <li><a href="#home" class="text-gray-400 hover:text-white transition text-sm md:text-base">Home</a></li>
+            <li><a href="#categories" class="text-gray-400 hover:text-white transition text-sm md:text-base">Product Categories</a></li>
+            <li><a href="#gallery" class="text-gray-400 hover:text-white transition text-sm md:text-base">Product Gallery</a></li>
+            <li><a href="#branches" class="text-gray-400 hover:text-white transition text-sm md:text-base">Our Branches</a></li>
+          </ul>
+        </div>
+
+        <!-- Block 3 -->
+        <div class="flex-1">
+          <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6 ar-text">خدماتنا</h3>
+          <h3 class="text-lg md:text-xl font-bold mb-4 md:mb-6 en-text lang-hidden">Our Services</h3>
+          <ul class="space-y-2 md:space-y-3">
+            <li class="text-gray-400 text-sm md:text-base ar-text">توصيل سريع</li>
+            <li class="text-gray-400 text-sm md:text-base ar-text">استبدال مجاني</li>
+            <li class="text-gray-400 text-sm md:text-base ar-text">دعم فني 24/7</li>
+            <li class="text-gray-400 text-sm md:text-base ar-text">ضمان الجودة</li>
+          </ul>
+          <ul class="space-y-2 md:space-y-3 en-text lang-hidden">
+            <li class="text-gray-400 text-sm md:text-base">Fast Delivery</li>
+            <li class="text-gray-400 text-sm md:text-base">Free Exchange</li>
+            <li class="text-gray-400 text-sm md:text-base">24/7 Support</li>
+            <li class="text-gray-400 text-sm md:text-base">Quality Guarantee</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom line -->
+    <div class="border-t border-gray-700 mt-8 md:mt-10 pt-6 text-center text-gray-400 text-sm md:text-base">
+      <p class="ar-text"> شركة إلين للملابس النسائية. جميع الحقوق محفوظة © 2023.</p>
+      <p class="en-text lang-hidden"> Elin Women's Clothing Company. All rights reserved © 2023.</p>
+    </div>
+  </div>
+</footer>
+
+
+
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<script>
+  
+    // Initialize AOS
+    AOS.init({ duration: 1000, once: true, offset: 100 });
+
+    // 1. Data Configuration
+    const branchData = [
+        { id: 1, city: 'tobruk', nameAr: 'فرع طبرق', nameEn: 'Tobruk Branch', addrAr: 'شارع فينسيا / طبرق', addrEn: 'Venice Street, Tobruk', lat: 32.07729778971245 , lng: 23.96282761812564 },
+        { id: 2, city: 'derna', nameAr: 'فرع درنة', nameEn: 'Derna Branch', addrAr: 'مول زعطوط / درنة', addrEn: 'Zaatout Mall, Derna', lat: 32.768324321513255,  lng: 22.643767189345752 },
+        { id: 3, city: 'albyda', nameAr: 'فرع البيضاء الرئيسي', nameEn: 'Al-Bayda Main Branch', addrAr: 'امتداد مطعم هابي تشيكن / البيضاء', addrEn: 'Happy Chicken St. Extension, Al-Bayda', lat: 32.761481563216215 , lng: 21.746834621065936 },
+        { id: 4, city: 'albyda', nameAr: 'فرع البيضاء الجديدة', nameEn: 'New Al-Bayda Branch', addrAr: 'بمقابل مول البكوش / البيضاء', addrEn: 'Opposite Al-Bakoush Mall, Al-Bayda', lat: 32.771711875338006, lng: 21.787936235984674 , },
+        { id: 5, city: 'albyda', nameAr: 'فرع النادي الأخضر', nameEn: 'Al-Akhdar Club Branch', addrAr: 'بالقرب من نادي الأخضر / البيضاء', addrEn: 'Near Al-Akhdar Club, Al-Bayda', lat: 32.76129977319019, lng:  21.74187144496309},
+        { id: 6, city: 'benghazi', nameAr: 'فرع طريق المطار', nameEn: 'Airport Road Branch', addrAr: 'طريق المطار مقابل الخطوط الأفريقية / بنغازي', addrEn: 'Airport Road, Opp. Afriqiyah Airways, Benghazi', lat: 32.106388200000005,  lng: 20.13549223561493},
+        { id: 7, city: 'benghazi', nameAr: 'فرع الهواري', nameEn: 'Al-Hawari Branch', addrAr: 'طريق الهواري مقابل طريق النهر / بنغازي', addrEn: 'Al-Hawari Road, Opp. River Road, Benghazi', lat: 32.05650471390754,  lng: 20.108161237658987 },
+        { id: 8, city: 'benghazi', nameAr: 'فرع فينيسيا', nameEn: 'Venice Branch', addrAr: 'مقابل حلواني الفائدي / بنغازي', addrEn: 'Opposite Al-Faidi Pastries, Benghazi', lat: 32.062451956904134,  lng: 20.089380465653644 },
+        { id: 9, city: 'ajdabiya', nameAr: 'فرع إجدابيا  1', nameEn: 'Ajdabiya Branch 1', addrAr: 'شارع انتلات / إجدابيا ', addrEn: 'Antelat Street, Ajdabiya', lat: 30.779827060615315,  lng: 20.22976247970974 },
+        { id: 10, city: 'ajdabiya', nameAr: 'فرع إجدابيا  2', nameEn: 'Ajdabiya Branch 2', addrAr: 'حي دمشق / إجدابيا ', addrEn: 'Damascus District, Ajdabiya', lat: 30.7450, lng: 20.2150 }
+    ];
+
+    // 2. Global Variables
+    let map;
+    let markers = [];
+    let isEnglish = false;
+    const langToggle = document.getElementById("langToggle");
+
+    // Define Pink Icon
+    const pinkIcon = L.divIcon({
+        html: `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#db2777" stroke="white" stroke-width="2"/>
+               </svg>`,
+        className: "custom-pin",
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30],
+    });
+
+    // 3. Language & UI Sync
+function updateUI() {
+    // 1. Identify what to show and what to hide
+    const arElements = document.querySelectorAll(".ar-text");
+    const enElements = document.querySelectorAll(".en-text");
+
+    if (isEnglish) {
+        // EN mode: Hide Arabic, Show English
+        arElements.forEach(el => el.classList.add("lang-hidden"));
+        enElements.forEach(el => el.classList.remove("lang-hidden"));
+    } else {
+        // AR mode: Hide English, Show Arabic
+        enElements.forEach(el => el.classList.add("lang-hidden"));
+        arElements.forEach(el => el.classList.remove("lang-hidden"));
+    }
+
+    // 2. Update Page Direction
+    document.documentElement.dir = isEnglish ? "ltr" : "rtl";
+    document.documentElement.lang = isEnglish ? "en" : "ar";
+
+    // 3. Update the specific Toggle Button Text
+    // This assumes your langToggle button has spans inside it with these classes
+    const toggleAr = langToggle.querySelector(".ar-text");
+    const toggleEn = langToggle.querySelector(".en-text");
+    
+    if (isEnglish) {
+        if(toggleAr) toggleAr.classList.add("lang-hidden");
+        if(toggleEn) toggleEn.classList.remove("lang-hidden");
+    } else {
+        if(toggleEn) toggleEn.classList.add("lang-hidden");
+        if(toggleAr) toggleAr.classList.remove("lang-hidden");
+    }
+
+    // 4. Refresh Map Branches
+    const activeTab = document.querySelector(".city-tab.active");
+    renderBranches(activeTab ? activeTab.dataset.city : "all");
+}
+ // 4. Map & Branch Logic
+    function initMap() {
+        const mapEl = document.getElementById("map");
+        if (!mapEl) return;
+
+        map = L.map("map").setView([32.5, 19.0], 6);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors",
+        }).addTo(map);
+
+        updateUI(); 
+    }
+
+    function renderBranches(selectedCity) {
+        const container = document.getElementById("branch-list-container");
+        if (!container) return;
+
+        container.innerHTML = ""; 
+        markers.forEach((m) => map.removeLayer(m)); 
+        markers = [];
+
+        const filtered = selectedCity === "all" ? branchData : branchData.filter((b) => b.city === selectedCity);
+
+        filtered.forEach((branch) => {
+            const name = isEnglish ? branch.nameEn : branch.nameAr;
+            const addr = isEnglish ? branch.addrEn : branch.addrAr;
+            const dirBtnText = isEnglish ? "Get Directions" : "الاتجاهات";
+
+            // Add Card
+            const card = document.createElement("div");
+            card.className = "branch-card bg-white p-5 rounded-2xl shadow-sm cursor-pointer mb-4 border-l-4 border-transparent hover:border-pink-600 hover:bg-pink-50 transition-all";
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <h4 class="font-bold text-lg text-gray-800">${name}</h4>
+                    <span class="text-[10px] bg-pink-100 text-pink-600 px-2 py-1 rounded-full uppercase font-bold">${branch.city}</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-4">
+                    <i class="fas fa-map-marker-alt text-pink-600 ${isEnglish ? "mr-2" : "ml-2"}"></i>${addr}
+                </p>
+                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <div class="flex items-center text-xs text-gray-400">
+                        <i class="far fa-clock text-pink-600 ${isEnglish ? "mr-1" : "ml-1"}"></i> 9:00 - 23:00
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="#" class="text-gray-400 hover:text-[#1877F2] transition-colors"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-[#E4405F] transition-colors"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-black transition-colors"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+            `;
+
+            card.onclick = (e) => {
+                if (e.target.closest('a')) return; // Don't move map if social link clicked
+                map.flyTo([branch.lat, branch.lng], 15);
+                if (window.innerWidth < 1024) document.getElementById("map").scrollIntoView({ behavior: "smooth" });
+            };
+            container.appendChild(card);
+
+            // Add Marker with Custom Icon
+            const marker = L.marker([branch.lat, branch.lng], { icon: pinkIcon }).addTo(map);
+            const googleMapsUrl = `https://www.google.com/maps?q=${branch.lat},${branch.lng}`;
+
+            const popupContent = `
+                <div style="text-align:${isEnglish ? "left" : "right"}; direction:${isEnglish ? "ltr" : "rtl"}; min-width:160px;">
+                    <strong style="color:#db2777; font-size:14px; display:block; margin-bottom:5px;">${name}</strong>
+                    <span style="color:#666; font-size:12px; display:block; margin-bottom:10px;">${addr}</span>
+                    <a href="${googleMapsUrl}" target="_blank" style="display:block; background:#db2777; color:white; text-align:center; padding:6px; border-radius:6px; text-decoration:none; font-size:11px; font-weight:bold;">
+                        <i class="fas fa-directions"></i> ${dirBtnText}
+                    </a>
+                </div>`;
+
+            marker.bindPopup(popupContent);
+            markers.push(marker);
+        });
+
+        if (filtered.length > 0 && selectedCity !== "all") {
+            const group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.5));
+        }
+    }
+
+    // 5. Event Listeners
+    langToggle.addEventListener("click", () => {
+        isEnglish = !isEnglish;
+        updateUI();
+    });
+
+    document.querySelectorAll(".city-tab").forEach((tab) => {
+        tab.addEventListener("click", function () {
+            document.querySelectorAll(".city-tab").forEach((t) => t.classList.remove("active"));
+            this.classList.add("active");
+            renderBranches(this.dataset.city);
+        });
+    });
+
+   window.addEventListener("DOMContentLoaded", () => {
+    initMap();
+    updateUI(); // Ensure this runs once at the start
+});
+    window.addEventListener("resize", () => { if (map) map.invalidateSize(); });
+
+    window.addEventListener("scroll", () => {
+        const header = document.querySelector(".sticky-header");
+        if (header) window.scrollY > 80 ? header.classList.add("sticky") : header.classList.remove("sticky");
+    });
+
+const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+const mobileMenu = document.getElementById("mobileMenu");
+
+// Toggle Menu
+mobileMenuBtn?.addEventListener("click", () => {
+    mobileMenu.classList.toggle("hidden");
+});
+
+// Close menu when clicking a link
+document.querySelectorAll(".mobile-link").forEach(link => {
+    link.addEventListener("click", () => {
+        mobileMenu.classList.add("hidden");
+    });
+});
+</script>
+  </body>
+</html>
